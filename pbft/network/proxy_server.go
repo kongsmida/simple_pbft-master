@@ -57,11 +57,13 @@ func (server *Server) setRoute() {
 
 }
 
-var T_start int64
+var T_start_req int64
+var T_start_croreq int64
+var T_start_as int64
 
 func (server *Server) getAS(writer http.ResponseWriter, request *http.Request) {
-	T_start = time.Now().UnixNano()
-	fmt.Println("Start to AS formation ------", T_start)
+	T_start_as = time.Now().UnixNano()
+	fmt.Println("Start to AS formation ------", T_start_as)
 	server.node.GetAS()
 }
 
@@ -89,6 +91,7 @@ func (server *Server) getASFormation(writer http.ResponseWriter, request *http.R
 
 func (server *Server) getReq(writer http.ResponseWriter, request *http.Request) {
 	var msg consensus.SingletxMsg
+	T_start_req = time.Now().UnixNano()
 	fmt.Println("getRequest success!")
 	err := json.NewDecoder(request.Body).Decode(&msg)
 	if err != nil {
@@ -100,7 +103,7 @@ func (server *Server) getReq(writer http.ResponseWriter, request *http.Request) 
 
 func (server *Server) getCrossReq(writer http.ResponseWriter, request *http.Request) {
 	var msg consensus.CrosstxMsg
-	T_start = time.Now().UnixNano()
+	T_start_croreq = time.Now().UnixNano()
 	fmt.Println("getCroRequest success!")
 	err := json.NewDecoder(request.Body).Decode(&msg)
 	if err != nil {

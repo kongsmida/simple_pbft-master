@@ -31,19 +31,6 @@ type Node struct {
 	MenberShip       []string  //加
 }
 
-type Transaction struct { //加
-	senders   []string
-	receivers []string
-	value     float32
-	txType
-}
-type txType int
-
-const (
-	Singletx txType = 1
-	Crosstx  txType = 0
-)
-
 type MsgBuffer struct {
 	SingletxMsgs   []*consensus.SingletxMsg
 	PrePrepareMsgs []*consensus.PrePrepareMsg
@@ -281,7 +268,6 @@ func (node *Node) Reply(msg *consensus.ReplyMsg) error { //只给主节点返回
 	for _, value := range node.CommittedMsgs {
 		fmt.Printf("Committed value: %s, %d, %s, %d\n", value.ClientID, value.Timestamp, value.Operation, value.SequenceID)
 	}
-
 	// jsonMsg, err := json.Marshal(msg)
 	// if err != nil {
 	// 	return err
@@ -299,7 +285,10 @@ func (node *Node) Reply(msg *consensus.ReplyMsg) error { //只给主节点返回
 // GetReq can be called when the node's CurrentState is nil.
 // Consensus start procedure for the Primary.
 func (node *Node) GetReq(reqMsg *consensus.SingletxMsg) error {
-	for _, v := range node.StateDB {
+	for i, v := range node.StateDB {
+		if i%2 == 0 {
+			fmt.Print("\n")
+		}
 		fmt.Print(v.Address, ":", v.Balance, " ")
 	}
 	// LogMsg(reqMsg) //打印消息
@@ -311,6 +300,7 @@ func (node *Node) GetReq(reqMsg *consensus.SingletxMsg) error {
 	}
 
 	if !node.SelectBalance(reqMsg.Operation) {
+		node.CurrentState = nil
 		return errors.New(fmt.Sprint("Do not have enough balance"))
 	}
 	// 开始共识，创建一个pre-prepare消息，包含viewID，序列号，摘要，请求消息
@@ -496,7 +486,7 @@ func (node *Node) GetPreCommit(preCommitMsg *consensus.ProofMsgs) error {
 				node.Broadcast(synchronizemsg, "/synchronize")
 				LogStage("Backup nodes are synchronizing!!!", false)
 				T_complete = time.Now().UnixNano()
-				Logfile(v.Subtx+"\n Execute time:"+strconv.FormatInt(T_complete-T_start, 10), node.NodeID)
+				Logfile(v.Subtx+"\n Execute time:"+strconv.FormatInt(T_complete-T_start_as, 10), node.NodeID)
 			}
 		}
 		node.CurrentState = nil
@@ -559,7 +549,8 @@ func (node *Node) GetCommit(commitMsg *consensus.VoteMsg) error {
 		fmt.Println(node.StateDB)
 		// Attach node ID to the message
 		replyMsg.NodeID = node.NodeID
-
+		T_complete = time.Now().UnixNano()
+		Logfile(committedMsg.Operation+"\nExecute time:"+strconv.FormatInt(T_complete-T_start_req, 10), node.NodeID+"inShard")
 		// Save the last version of committed messages to node.
 		node.CommittedMsgs = append(node.CommittedMsgs, committedMsg)
 
@@ -580,7 +571,7 @@ func (node *Node) GetAS() {
 	proofofprimarymsg.PrimaryID = node.NodeID[0:4] + "00"
 	proofofprimarymsg.ProofType = consensus.ProofofPrimaryMsg
 	proofofprimarymsg.NodeID = node.NodeID
-	proofofprimarymsg.StartTime = T_start
+	proofofprimarymsg.StartTime = T_start_as
 
 	//对消息prooofprimarymsg签名
 	jsonMsg, _ := json.Marshal(proofofprimarymsg)
@@ -874,7 +865,6 @@ func (node *Node) resolveMsg() {
 		// Get buffered messages from the dispatcher.
 		msgs := <-node.MsgDelivery
 		switch msgs.(type) {
-
 		case []*consensus.SynchronizeMsg:
 			errs := node.resolveSynMsg(msgs.([]*consensus.SynchronizeMsg))
 			if len(errs) != 0 {
