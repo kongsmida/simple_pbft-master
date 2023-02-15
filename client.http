@@ -1,0 +1,17 @@
+# curl -H "Content-Type:application/json" -X POST -d '{"clientID":"A","operation":"From:A,To:B,Value:1","timestamp":859381532}' http://localhost:000100/req
+curl -H "Content-Type:application/json" -X POST -d '{"clientID":"administator"}' http://localhost:000101/as
+###
+curl -H "Content-Type:application/json" -X POST -d "{"clientID":"A"}" http://47.98.137.186:000100/req
+# curl -H "Content-Type:application/json" -X POST -d '{"clientID":"administator"}' http://localhost:000111/as
+# curl -H "Content-Type:application/json" -X POST -d '{"clientID":"administator"}' http://localhost:001001/as
+# curl -H "Content-Type:application/json" -X POST -d '{"clientID":"administator"}' http://localhost:001010/as
+# curl -H "Content-Type:application/json" -X POST -d '{"clientID":"administator"}' http://localhost:001011/as
+# curl -H "Content-Type:application/json" -X POST -d '{"clientID":"administator"}' http://localhost:001101/as
+# curl -H "Content-Type:application/json" -X POST -d '{"clientID":"administator"}' http://localhost:001110/as
+# curl -H "Content-Type:application/json" -X POST -d '{"clientID":"administator"}' http://localhost:001111/as
+# curl -H "Content-Type:application/json" -X POST -d '{"clientID":"administator"}' http://localhost:010001/as
+# curl -H "Content-Type:application/json" -X POST -d '{"clientID":"administator"}' http://localhost:010010/as
+# curl -H "Content-Type:application/json" -X POST -d '{"clientID":"administator"}' http://localhost:010011/as
+# curl -H "Content-Type:application/json" -X POST -d '{"clientID":"administator"}' http://localhost:010101/as
+# curl -H "Content-Type:application/json" -X POST -d '{"clientID":"administator"}' http://localhost:010110/as
+# curl -H "Content-Type:application/json" -X POST -d '{"clientID":"administator"}' http://localhost:010111/as
